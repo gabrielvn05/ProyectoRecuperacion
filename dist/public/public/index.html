@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Videojuegos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .filter-form {
+      margin-bottom: 20px;
+    }
+
+    .filter-form label {
+      margin-right: 10px;
+    }
+
+    .filter-form input, .filter-form select {
+      padding: 5px;
+      margin-right: 10px;
+    }
+
+    .filter-form button {
+      padding: 5px 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .filter-form button:hover {
+      background-color: #218838;
+    }
+
+    .videojuego-item {
+      background-color: white;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .videojuego-item h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .videojuego-item p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lista de Videojuegos</h1>
+  </header>
+
+  <main>
+    <form class="filter-form" id="filterForm">
+      <label for="plataforma">Plataforma:</label>
+      <select id="plataforma" name="plataforma">
+        <option value="">Todas</option>
+        <option value="PlayStation">PlayStation</option>
+        <option value="Xbox">Xbox</option>
+        <option value="PC">PC</option>
+        <option value="Nintendo">Nintendo</option>
+      </select>
+
+      <label for="genero">Género:</label>
+      <select id="genero" name="genero">
+        <option value="">Todos</option>
+        <option value="Acción">Acción</option>
+        <option value="Aventura">Aventura</option>
+        <option value="RPG">RPG</option>
+        <option value="Deportes">Deportes</option>
+      </select>
+
+      <label for="precioMin">Precio mínimo:</label>
+      <input type="number" id="precioMin" name="precioMin" step="0.01" placeholder="Ej: 10.00">
+
+      <label for="precioMax">Precio máximo:</label>
+      <input type="number" id="precioMax" name="precioMax" step="0.01" placeholder="Ej: 100.00">
+
+      <button type="submit">Filtrar</button>
+    </form>
+
+    <div class="videojuegos-list" id="videojuegosList"></div>
+  </main>
+
+  <script>
+    const filterForm = document.getElementById('filterForm');
+    const videojuegosList = document.getElementById('videojuegosList');
+
+    // Función para obtener los videojuegos desde el backend
+    async function fetchVideojuegos(query = '') {
+      try {
+        const response = await fetch(`http://localhost:5000/api/videojuegos${query}`);
+        const videojuegos = await response.json();
+
+        // Limpiar la lista
+        videojuegosList.innerHTML = '';
+        
+        // Mostrar los videojuegos obtenidos
+        videojuegos.forEach(videojuego => {
+          const videojuegoItem = document.createElement('div');
+          videojuegoItem.classList.add('videojuego-item');
+          videojuegoItem.innerHTML = `
+            <h3>${videojuego.nombre}</h3>
+            <p>Plataforma: ${videojuego.plataforma}</p>
+            <p>Género: ${videojuego.genero}</p>
+            <p>Precio: $${videojuego.precio}</p>
+          `;
+          videojuegosList.appendChild(videojuegoItem);
+        });
+      } catch (error) {
+        console.error('Error fetching videojuegos:', error);
+      }
+    }
+
+    // Obtener los videojuegos al cargar la página
+    fetchVideojuegos();
+
+    // Función para aplicar los filtros al enviar el formulario
+    filterForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const plataforma = document.getElementById('plataforma').value;
+      const genero = document.getElementById('genero').value;
+      const precioMin = document.getElementById('precioMin').value;
+      const precioMax = document.getElementById('precioMax').value;
+
+      let query = '?';
+      if (plataforma) query += `plataforma=${plataforma}&`;
+      if (genero) query += `genero=${genero}&`;
+      if (precioMin) query += `precioMin=${precioMin}&`;
+      if (precioMax) query += `precioMax=${precioMax}&`;
+
+      fetchVideojuegos(query);
+    });
+
+    filterForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const plataforma = document.getElementById('plataforma').value;
+  const genero = document.getElementById('genero').value;
+  const precioMin = document.getElementById('precioMin').value;
+  const precioMax = document.getElementById('precioMax').value;
+
+  let query = '?';
+  if (plataforma) query += `plataforma=${plataforma}&`;
+  if (genero) query += `genero=${genero}&`;
+  if (precioMin) query += `precioMin=${precioMin}&`;
+  if (precioMax) query += `precioMax=${precioMax}&`;
+
+
+  query = query.endsWith('&') ? query.slice(0, -1) : query;
+
+  fetchVideojuegos(query);
+});
+
+  </script>
+</body>
+</html>
+ 
